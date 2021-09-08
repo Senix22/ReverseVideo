@@ -7,7 +7,7 @@ import android.net.Uri
 import android.util.Log
 import java.io.File
 
-class ConvertVideo: IntentService("ConversionService") {
+class ConvertVideo : IntentService("ConversionService") {
     override fun onHandleIntent(intent: Intent?) {
         intent?.let {
             val reverseVideoSettings = ReverseVideoSettings()
@@ -16,42 +16,56 @@ class ConvertVideo: IntentService("ConversionService") {
             var inputVidUri = it.getParcelableExtra<Uri>(KEY_INPUT_VID_URI)
             val allKeyFrames = it.getBooleanExtra(KEY_ALL_IFRAMES, true)
 
-            val startTime = System.currentTimeMillis()
-
+            reverseVideo(allKeyFrames, inputVidUri!!, outPath!!, keyFrame, reverseVideoSettings)
 //            forward(allKeyFrames,inputVidUri!!,outPath!!,keyFrame)
-//            // Convert all frames to keyframes?
-            if (allKeyFrames) {
-                val tmpVidPath = cacheDir.absolutePath + "/out.vid"
-                if (inputVidUri != null) {
-                    contentResolver.openFileDescriptor(inputVidUri, "r").use {
-                        if (it != null) {
-                            if (outPath != null) {
-                                KeyFrameConverter(keyFrame).convert(tmpVidPath, it.fileDescriptor)
-                            }
-                        }
-                    }
-                }
-                inputVidUri = Uri.fromFile(File(tmpVidPath))
-            }
+        }
+    }
 
-            // Reverse video here
+
+    private fun reverseVideo(
+        allKeyFrames: Boolean,
+        inputVidUri1: Uri?,
+        outPath: String?,
+        keyFrame: KeyFrameSettings,
+        reverseVideoSettings: ReverseVideoSettings
+    ) {
+        var inputVidUri = inputVidUri1
+        if (allKeyFrames) {
+            val tmpVidPath = cacheDir.absolutePath + "/out.vid"
             if (inputVidUri != null) {
                 contentResolver.openFileDescriptor(inputVidUri, "r").use {
                     if (it != null) {
                         if (outPath != null) {
-                            ReverseVideo(reverseVideoSettings).convert(outPath, it.fileDescriptor,"ASa")
+                            KeyFrameConverter(keyFrame).convert(tmpVidPath, it.fileDescriptor)
                         }
                     }
                 }
             }
-            Log.d(TAG, "Total processing duration=" + (System.currentTimeMillis() - startTime)/1000 +  " seconds")
+            inputVidUri = Uri.fromFile(File(tmpVidPath))
+        }
 
-            val pi = intent.getParcelableExtra<PendingIntent>(KEY_RESULT_INTENT)
-            pi?.send()
+        // Reverse video here
+        if (inputVidUri != null) {
+            contentResolver.openFileDescriptor(inputVidUri, "r").use {
+                if (it != null) {
+                    if (outPath != null) {
+                        ReverseVideo(reverseVideoSettings).convert(
+                            outPath,
+                            it.fileDescriptor,
+                            "ASa"
+                        )
+                    }
+                }
+            }
         }
     }
 
-    private fun forward(allKeyFrames : Boolean,inputVidUri : Uri,outPath : String,keyFrame : KeyFrameSettings) : Uri?{
+    private fun forward(
+        allKeyFrames: Boolean,
+        inputVidUri: Uri,
+        outPath: String,
+        keyFrame: KeyFrameSettings
+    ): Uri? {
         // Convert all frames to keyframes?
         if (allKeyFrames) {
             val tmpVidPath = cacheDir.absolutePath + "/out.vid"
