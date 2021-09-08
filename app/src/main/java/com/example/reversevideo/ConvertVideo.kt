@@ -18,15 +18,15 @@ class ConvertVideo: IntentService("ConversionService") {
 
             val startTime = System.currentTimeMillis()
 
-
-            // Convert all frames to keyframes?
+//            forward(allKeyFrames,inputVidUri!!,outPath!!,keyFrame)
+//            // Convert all frames to keyframes?
             if (allKeyFrames) {
                 val tmpVidPath = cacheDir.absolutePath + "/out.vid"
                 if (inputVidUri != null) {
                     contentResolver.openFileDescriptor(inputVidUri, "r").use {
                         if (it != null) {
                             if (outPath != null) {
-                                KeyFrameConverter(keyFrame).convert(outPath, it.fileDescriptor)
+                                KeyFrameConverter(keyFrame).convert(tmpVidPath, it.fileDescriptor)
                             }
                         }
                     }
@@ -34,21 +34,39 @@ class ConvertVideo: IntentService("ConversionService") {
                 inputVidUri = Uri.fromFile(File(tmpVidPath))
             }
 
-//            // Reverse video here
-//            if (inputVidUri != null) {
-//                contentResolver.openFileDescriptor(inputVidUri, "r").use {
-//                    if (it != null) {
-//                        if (outPath != null) {
-//                            ReverseVideo(reverseVideoSettings).convert(outPath, it.fileDescriptor,"ASa")
-//                        }
-//                    }
-//                }
-//            }
-//            Log.d(TAG, "Total processing duration=" + (System.currentTimeMillis() - startTime)/1000 +  " seconds")
-//
-//            val pi = intent.getParcelableExtra<PendingIntent>(KEY_RESULT_INTENT)
-//            pi?.send()
+            // Reverse video here
+            if (inputVidUri != null) {
+                contentResolver.openFileDescriptor(inputVidUri, "r").use {
+                    if (it != null) {
+                        if (outPath != null) {
+                            ReverseVideo(reverseVideoSettings).convert(outPath, it.fileDescriptor,"ASa")
+                        }
+                    }
+                }
+            }
+            Log.d(TAG, "Total processing duration=" + (System.currentTimeMillis() - startTime)/1000 +  " seconds")
+
+            val pi = intent.getParcelableExtra<PendingIntent>(KEY_RESULT_INTENT)
+            pi?.send()
         }
+    }
+
+    private fun forward(allKeyFrames : Boolean,inputVidUri : Uri,outPath : String,keyFrame : KeyFrameSettings) : Uri?{
+        // Convert all frames to keyframes?
+        if (allKeyFrames) {
+            val tmpVidPath = cacheDir.absolutePath + "/out.vid"
+            if (inputVidUri != null) {
+                contentResolver.openFileDescriptor(inputVidUri, "r").use {
+                    if (it != null) {
+                        if (outPath != null) {
+                            KeyFrameConverter(keyFrame).convert(outPath, it.fileDescriptor)
+                        }
+                    }
+                }
+            }
+            return Uri.fromFile(File(tmpVidPath))
+        }
+        return null
     }
 
     companion object {

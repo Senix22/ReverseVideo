@@ -282,6 +282,7 @@ class ReverseVideo(private val reverseSettings: ReverseVideoSettings) {
         throw InvalidParameterException("File contains no audio track")
     }
 
+
     @SuppressLint("WrongConstant")
     private fun muxAudio(maxChunkSize: Int) {
         val audioBufferInfo = MediaCodec.BufferInfo()
@@ -290,7 +291,7 @@ class ReverseVideo(private val reverseSettings: ReverseVideoSettings) {
         while (true) {
             if (audioExtractor.sampleFlags == MediaExtractor.SAMPLE_FLAG_SYNC) {
                 audioSampleTimes.push(audioExtractor.sampleTime)
-                Log.d(TAG, "muxAudio: ${audioSampleTimes.push(audioExtractor.sampleTime)}", )
+//                Log.d(TAG, "muxAudio: ${audioSampleTimes.push(audioExtractor.sampleTime)}", )
             }
 
             if (!audioExtractor.advance())
