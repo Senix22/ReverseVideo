@@ -301,7 +301,6 @@ class ReverseVideo(private val reverseSettings: ReverseVideoSettings) {
 
             val next = audioSampleTimes.pop()
             audioExtractor.seekTo(next, MediaExtractor.SEEK_TO_NEXT_SYNC)
-            Log.d(TAG, "muxAudio: seekTo ${  audioExtractor.seekTo(next, MediaExtractor.SEEK_TO_CLOSEST_SYNC)}")
             val chunkSize = audioExtractor.readSampleData(audioBuffer, 0)
 
             if (chunkSize > 0) {
@@ -352,8 +351,6 @@ class ReverseVideo(private val reverseSettings: ReverseVideoSettings) {
         while (true) {
             if (videoExtractor.sampleFlags == MediaExtractor.SAMPLE_FLAG_SYNC) {
                 videoSampleTimes.push(videoExtractor.sampleTime)
-                Log.e(TAG, "push: ${videoSampleTimes.push(videoExtractor!!.sampleTime)}")
-                Log.e(TAG, "push 111 : $videoSampleTimes" )
             }
 
             if (!videoExtractor.advance())
