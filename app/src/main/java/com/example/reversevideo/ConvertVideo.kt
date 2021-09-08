@@ -25,27 +25,29 @@ class ConvertVideo: IntentService("ConversionService") {
                 if (inputVidUri != null) {
                     contentResolver.openFileDescriptor(inputVidUri, "r").use {
                         if (it != null) {
-                            KeyFrameConverter(keyFrame).convert(tmpVidPath, it.fileDescriptor)
+                            if (outPath != null) {
+                                KeyFrameConverter(keyFrame).convert(outPath, it.fileDescriptor)
+                            }
                         }
                     }
                 }
                 inputVidUri = Uri.fromFile(File(tmpVidPath))
             }
 
-            // Reverse video here
-            if (inputVidUri != null) {
-                contentResolver.openFileDescriptor(inputVidUri, "r").use {
-                    if (it != null) {
-                        if (outPath != null) {
-                            ReverseVideo(reverseVideoSettings).convert(outPath, it.fileDescriptor,"ASa")
-                        }
-                    }
-                }
-            }
-            Log.d(TAG, "Total processing duration=" + (System.currentTimeMillis() - startTime)/1000 +  " seconds")
-
-            val pi = intent.getParcelableExtra<PendingIntent>(KEY_RESULT_INTENT)
-            pi?.send()
+//            // Reverse video here
+//            if (inputVidUri != null) {
+//                contentResolver.openFileDescriptor(inputVidUri, "r").use {
+//                    if (it != null) {
+//                        if (outPath != null) {
+//                            ReverseVideo(reverseVideoSettings).convert(outPath, it.fileDescriptor,"ASa")
+//                        }
+//                    }
+//                }
+//            }
+//            Log.d(TAG, "Total processing duration=" + (System.currentTimeMillis() - startTime)/1000 +  " seconds")
+//
+//            val pi = intent.getParcelableExtra<PendingIntent>(KEY_RESULT_INTENT)
+//            pi?.send()
         }
     }
 

@@ -131,7 +131,6 @@ class KeyFrameConverter(private val keyFrameSettings: KeyFrameSettings) {
 
                 muxer?.writeSampleData(keyFrameSettings.audioIndex, audioBuffer, audioBufferInfo)
                 audioExtractor.advance()
-                Log.e(TAG, "muxAudio: ${ audioExtractor.advance()}", )
             } else {
                 break
             }
